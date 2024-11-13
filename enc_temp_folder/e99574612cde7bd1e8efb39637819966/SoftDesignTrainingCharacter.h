@@ -1,9 +1,7 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
-#include "BehaviorTree/BehaviorTree.h"
 #include "SoftDesignTrainingCharacter.generated.h"
-
 
 
 UCLASS()
@@ -17,12 +15,6 @@ public:
     virtual void BeginPlay() override;
     virtual void OnCollectPowerUp() {};
     void Die();
-
-    UBehaviorTree* GetBehaviorTree() const { return m_aiBehaviorTree; };
-
-private:
-    UPROPERTY(EditAnywhere, category = Behavior)
-    UBehaviorTree* m_aiBehaviorTree;
 
 protected:
     UFUNCTION()

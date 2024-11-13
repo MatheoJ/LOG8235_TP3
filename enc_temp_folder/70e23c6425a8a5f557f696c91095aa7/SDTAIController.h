@@ -4,10 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "SDTBaseAIController.h"
-#include <BehaviorTree/BlackboardComponent.h>
-#include <BehaviorTree/BehaviorTreeComponent.h>
-
 #include "SDTAIController.generated.h"
+
 /**
  * 
  */
@@ -58,8 +56,6 @@ protected:
     void GetHightestPriorityDetectionHit(const TArray<FHitResult>& hits, FHitResult& outDetectionHit);
     void UpdatePlayerInteractionBehavior(const FHitResult& detectionHit, float deltaTime);
     void StartBehaviorTree(APawn* pawn);
-    void StopBehaviorTree(APawn* pawn);
-    void OnPossess(APawn* pawn);
     PlayerInteractionBehavior GetCurrentPlayerInteractionBehavior(const FHitResult& hit);
     bool HasLoSOnHit(const FHitResult& hit);
     void MoveToRandomCollectible();
@@ -75,24 +71,11 @@ public:
     void SetActorLocation(const FVector& targetLocation);
     void AIStateInterrupted();
 
-
 private:
     virtual void GoToBestTarget(float deltaTime) override;
     virtual void UpdatePlayerInteraction(float deltaTime) override;
     virtual void ShowNavigationPath() override;
 
-    UPROPERTY(transient)
-    UBehaviorTreeComponent* m_behaviorTreeComponent;
-
-    UPROPERTY(transient)
-    UBlackboardComponent* m_blackboardComponent;
-
-
-    uint16  m_playerDetectedBBKeyID;
-    uint16  m_playerPoweredUpBBKeyID;
-    uint16  m_collectiblePosBBKeyID;
-    uint16  m_playerPosBBKeyID;
-    uint16  m_fleePosBBKeyID;
 
 protected:
     FVector m_JumpTarget;

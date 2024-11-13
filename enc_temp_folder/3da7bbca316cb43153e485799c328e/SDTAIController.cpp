@@ -7,19 +7,14 @@
 #include "SDTPathFollowingComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 //#include "UnrealMathUtility.h"
 #include "SDTUtils.h"
 #include "EngineUtils.h"
-#include "SoftDesignTrainingCharacter.h"
 
 ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer.SetDefaultSubobjectClass<USDTPathFollowingComponent>(TEXT("PathFollowingComponent")))
 {
     m_PlayerInteractionBehavior = PlayerInteractionBehavior_Collect;
-
-    m_behaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
-    m_blackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 }
 
 void ASDTAIController::GoToBestTarget(float deltaTime)
@@ -364,48 +359,5 @@ void ASDTAIController::UpdatePlayerInteractionBehavior(const FHitResult& detecti
     {
         m_PlayerInteractionBehavior = currentBehavior;
         AIStateInterrupted();
-    }
-}
-
-void ASDTAIController::StartBehaviorTree(APawn* pawn)
-{
-    if (ASoftDesignTrainingCharacter* aiBaseCharacter = Cast<ASoftDesignTrainingCharacter>(pawn))
-    {
-        if (aiBaseCharacter->GetBehaviorTree())
-        {
-            m_behaviorTreeComponent->StartTree(*aiBaseCharacter->GetBehaviorTree());
-        }
-    }
-}
-
-void ASDTAIController::StopBehaviorTree(APawn* pawn)
-{
-    if (ASoftDesignTrainingCharacter* aiBaseCharacter = Cast<ASoftDesignTrainingCharacter>(pawn))
-    {
-        if (aiBaseCharacter->GetBehaviorTree())
-        {
-            m_behaviorTreeComponent->StopTree();
-        }
-    }
-}
-void ASDTAIController::OnPossess(APawn* pawn)
-{
-    Super::OnPossess(pawn);
-
-    if (ASoftDesignTrainingCharacter* aiBaseCharacter = Cast<ASoftDesignTrainingCharacter>(pawn))
-    {
-        if (aiBaseCharacter->GetBehaviorTree())
-        {
-            m_blackboardComponent->InitializeBlackboard(*aiBaseCharacter->GetBehaviorTree()->BlackboardAsset);
-
-            m_playerDetectedBBKeyID = m_blackboardComponent->GetKeyID("PlayerDetected");
-            m_playerPosBBKeyID = m_blackboardComponent->GetKeyID("PlayerPos");
-            m_playerPoweredUpBBKeyID = m_blackboardComponent->GetKeyID("PlayerPoweredUp");
-            m_collectiblePosBBKeyID = m_blackboardComponent->GetKeyID("CollectiblePos");
-            m_fleePosBBKeyID = m_blackboardComponent->GetKeyID("FleePos");
-
-            //Set this agent in the BT
-            m_blackboardComponent->SetValue<UBlackboardKeyType_Object>(m_blackboardComponent->GetKeyID("SelfActor"), pawn);
-        }
     }
 }

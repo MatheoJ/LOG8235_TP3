@@ -54,4 +54,3 @@ void ASoftDesignTrainingCharacter::Die()
         controller->AIStateInterrupted();
     }
 }
-
