@@ -210,6 +210,7 @@ void ASDTAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollow
     Super::OnMoveCompleted(RequestID, Result);
 
     m_ReachedTarget = true;
+    currentCollectible = nullptr;
 }
 
 void ASDTAIController::ShowNavigationPath()
@@ -478,4 +479,28 @@ ASDTFleeLocation* ASDTAIController::GetBestFleeLocation() {
     }
 
     return bestFleeLocation;
+}
+
+ASDTCollectible* ASDTAIController::GetRandomCollectible() {
+    TArray<AActor*> foundCollectibles;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASDTCollectible::StaticClass(), foundCollectibles);
+
+    while (foundCollectibles.Num() != 0)
+    {
+        int index = FMath::RandRange(0, foundCollectibles.Num() - 1);
+
+        ASDTCollectible* collectibleActor = Cast<ASDTCollectible>(foundCollectibles[index]);
+        if (!collectibleActor)
+            return nullptr;
+
+        if (!collectibleActor->IsOnCooldown())
+        {
+            return collectibleActor;
+        }
+        else
+        {
+            foundCollectibles.RemoveAt(index);
+        }
+    }
+    return nullptr;
 }

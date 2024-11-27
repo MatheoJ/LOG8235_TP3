@@ -9,7 +9,9 @@
 
 
 #include "SDTFleeLocation.h"
+#include "SDTCollectible.h"
 #include "SDTAIController.generated.h"
+
 /**
  * 
  */
@@ -81,12 +83,15 @@ public:
     void StopBehaviorTree(APawn* pawn);
     bool hasPlayerInLoS();
     ASDTFleeLocation* GetBestFleeLocation();
+    ASDTCollectible* GetRandomCollectible();
 
     uint16  m_playerDetectedBBKeyID;
     uint16  m_playerPoweredUpBBKeyID;
     uint16  m_collectiblePosBBKeyID;
     uint16  m_playerPosBBKeyID;
     uint16  m_fleePosBBKeyID;
+
+    ASDTCollectible* currentCollectible = nullptr;
 
 private:
     virtual void GoToBestTarget(float deltaTime) override;
