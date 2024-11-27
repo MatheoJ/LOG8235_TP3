@@ -18,6 +18,11 @@ ASoftDesignTrainingCharacter::ASoftDesignTrainingCharacter()
 void ASoftDesignTrainingCharacter::BeginPlay()
 {
     Super::BeginPlay();
+    if (ASDTAIController* controller = Cast<ASDTAIController>(GetController()))
+    {
+        controller->StartBehaviorTree(this);
+    }
+
 
     GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ASoftDesignTrainingCharacter::OnBeginOverlap);
     m_StartingPosition = GetActorLocation();

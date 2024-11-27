@@ -234,6 +234,39 @@ void ASDTAIController::ShowNavigationPath()
     }
 }
 
+bool ASDTAIController::hasPlayerInLoS()
+{
+    APawn* selfPawn = GetPawn();
+    if (!selfPawn)
+        return false;
+
+    FVector detectionStartLocation = selfPawn->GetActorLocation() + selfPawn->GetActorForwardVector() * m_DetectionCapsuleForwardStartingOffset;
+    FVector detectionEndLocation = detectionStartLocation + selfPawn->GetActorForwardVector() * m_DetectionCapsuleHalfLength * 2;
+
+    TArray<TEnumAsByte<EObjectTypeQuery>> detectionTraceObjectTypes;
+    detectionTraceObjectTypes.Add(UEngineTypes::ConvertToObjectType(COLLISION_PLAYER));
+
+    TArray<FHitResult> allDetectionHits;
+    GetWorld()->SweepMultiByObjectType(allDetectionHits, detectionStartLocation, detectionEndLocation, FQuat::Identity, detectionTraceObjectTypes, FCollisionShape::MakeSphere(m_DetectionCapsuleRadius));
+
+    DrawDebugCapsule(GetWorld(), detectionStartLocation + m_DetectionCapsuleHalfLength * selfPawn->GetActorForwardVector(), m_DetectionCapsuleHalfLength, m_DetectionCapsuleRadius, selfPawn->GetActorQuat() * selfPawn->GetActorUpVector().ToOrientationQuat(), FColor::Blue);
+
+    for (const FHitResult& hit : allDetectionHits)
+    {
+        if (UPrimitiveComponent* component = hit.GetComponent())
+        {
+            if (component->GetCollisionObjectType() == COLLISION_PLAYER)
+            {
+                if (hit.GetComponent()) {
+                    return HasLoSOnHit(hit);
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 void ASDTAIController::UpdatePlayerInteraction(float deltaTime)
 {
     //finish jump before updating AI state
@@ -408,4 +441,41 @@ void ASDTAIController::OnPossess(APawn* pawn)
             m_blackboardComponent->SetValue<UBlackboardKeyType_Object>(m_blackboardComponent->GetKeyID("SelfActor"), pawn);
         }
     }
+}
+
+ASDTFleeLocation* ASDTAIController::GetBestFleeLocation() {
+    float bestLocationScore = 0.f;
+    ASDTFleeLocation* bestFleeLocation = nullptr;
+
+    ACharacter* playerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+    if (!playerCharacter)
+        return nullptr;
+
+    for (TActorIterator<ASDTFleeLocation> actorIterator(GetWorld(), ASDTFleeLocation::StaticClass()); actorIterator; ++actorIterator)
+    {
+        ASDTFleeLocation* fleeLocation = Cast<ASDTFleeLocation>(*actorIterator);
+        if (fleeLocation)
+        {
+            float distToFleeLocation = FVector::Dist(fleeLocation->GetActorLocation(), playerCharacter->GetActorLocation());
+
+            FVector selfToPlayer = playerCharacter->GetActorLocation() - GetPawn()->GetActorLocation();
+            selfToPlayer.Normalize();
+
+            FVector selfToFleeLocation = fleeLocation->GetActorLocation() - GetPawn()->GetActorLocation();
+            selfToFleeLocation.Normalize();
+
+            float fleeLocationToPlayerAngle = FMath::RadiansToDegrees(acosf(FVector::DotProduct(selfToPlayer, selfToFleeLocation)));
+            float locationScore = distToFleeLocation + fleeLocationToPlayerAngle * 100.f;
+
+            if (locationScore > bestLocationScore)
+            {
+                bestLocationScore = locationScore;
+                bestFleeLocation = fleeLocation;
+            }
+
+            DrawDebugString(GetWorld(), FVector(0.f, 0.f, 10.f), FString::SanitizeFloat(locationScore), fleeLocation, FColor::Red, 5.f, false);
+        }
+    }
+
+    return bestFleeLocation;
 }
