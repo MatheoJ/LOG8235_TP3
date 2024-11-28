@@ -10,6 +10,8 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 #include <AIController.h>
 
+#include "FollowingGroupManager.h"
+
 
 
 UMyBTService_DetectPlayer::UMyBTService_DetectPlayer()
@@ -17,11 +19,7 @@ UMyBTService_DetectPlayer::UMyBTService_DetectPlayer()
 }
 
 void UMyBTService_DetectPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-
 {
-    //UE_LOG(LogTemp, Display, TEXT("Player test"));
-    //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
-    
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
          
@@ -35,10 +33,6 @@ void UMyBTService_DetectPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 
             //write to bb the position of the target
             OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Vector>(aiController->m_playerPosBBKeyID, playerCharacter->GetActorLocation());
-
-            //Log the 
-            UE_LOG(LogTemp, Display, TEXT("Player Seen"));
-
         }
         else
         {

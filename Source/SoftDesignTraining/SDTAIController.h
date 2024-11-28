@@ -24,6 +24,8 @@ class SOFTDESIGNTRAINING_API ASDTAIController : public ASDTBaseAIController
 public:
     ASDTAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+    virtual void Tick(float deltaTime) override;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
     float m_DetectionCapsuleHalfLength = 500.f;
 
@@ -90,6 +92,7 @@ public:
     uint16  m_collectiblePosBBKeyID;
     uint16  m_playerPosBBKeyID;
     uint16  m_fleePosBBKeyID;
+	uint16  m_followingPosBBKeyID;
 
     ASDTCollectible* currentCollectible = nullptr;
 

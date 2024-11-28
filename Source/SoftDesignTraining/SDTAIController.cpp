@@ -11,6 +11,7 @@
 //#include "UnrealMathUtility.h"
 #include "SDTUtils.h"
 #include "EngineUtils.h"
+#include "FollowingGroupManager.h"
 #include "SoftDesignTrainingCharacter.h"
 
 ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
@@ -20,6 +21,17 @@ ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
 
     m_behaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
     m_blackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
+}
+
+void ASDTAIController::Tick(float deltaTime)
+{
+	Super::Tick(deltaTime);
+
+	if (FollowingGroupManager::isInGroup(GetPawn()))
+	{
+        // Draw debug shere on top of pawn
+		DrawDebugSphere(GetWorld(), GetPawn()->GetActorLocation() + FVector(0.f, 0.f, 100.f), 50.f, 8, FColor::Red);
+	}
 }
 
 void ASDTAIController::GoToBestTarget(float deltaTime)
@@ -208,6 +220,7 @@ void ASDTAIController::SetActorLocation(const FVector& targetLocation)
 void ASDTAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
     Super::OnMoveCompleted(RequestID, Result);
+
 
     m_ReachedTarget = true;
     currentCollectible = nullptr;
@@ -437,6 +450,7 @@ void ASDTAIController::OnPossess(APawn* pawn)
             m_playerPoweredUpBBKeyID = m_blackboardComponent->GetKeyID("PlayerPoweredUp");
             m_collectiblePosBBKeyID = m_blackboardComponent->GetKeyID("CollectiblePos");
             m_fleePosBBKeyID = m_blackboardComponent->GetKeyID("FleePos");
+			m_followingPosBBKeyID = m_blackboardComponent->GetKeyID("FollowingPos");
 
             //Set this agent in the BT
             m_blackboardComponent->SetValue<UBlackboardKeyType_Object>(m_blackboardComponent->GetKeyID("SelfActor"), pawn);
