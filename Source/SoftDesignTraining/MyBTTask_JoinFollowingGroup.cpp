@@ -15,11 +15,30 @@ EBTNodeResult::Type UMyBTTask_JoinFollowingGroup::ExecuteTask(UBehaviorTreeCompo
 {
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
-		FollowingGroupManager::AddToGroup(aiController->GetPawn());
+        APawn* pawn = aiController->GetPawn();
+        if (!pawn)
+        {
+            UE_LOG(LogTemp, Error, TEXT("Pawn is null in UMyBTTask_UpdateTick::ExecuteTask"));
+            return EBTNodeResult::Failed; // Retournez "Failed" si le Pawn est nul
+        }
+
+
+        UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
+        if (!BlackboardComp)
+        {
+            UE_LOG(LogTemp, Error, TEXT("BlackboardComponent is null in UMyBTTask_UpdateTick::ExecuteTask"));
+            return EBTNodeResult::Failed;
+        }
+
+        if ( BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            pawn->SetActorTickEnabled(true);
+		FollowingGroupManager::AddToGroup(pawn);
 		FollowingGroupManager::lastKnownPosition = 
             OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(aiController->m_playerPosBBKeyID);
 
 		return EBTNodeResult::Succeeded;
+        }
+        pawn->SetActorTickEnabled(false);
     }
 
     return EBTNodeResult::Failed;

@@ -20,6 +20,8 @@ UMyBTService_DetectPlayer::UMyBTService_DetectPlayer()
 
 void UMyBTService_DetectPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+
+    Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
          

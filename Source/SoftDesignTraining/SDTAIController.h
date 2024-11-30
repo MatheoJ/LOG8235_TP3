@@ -84,6 +84,8 @@ public:
     void StartBehaviorTree(APawn* pawn);
     void StopBehaviorTree(APawn* pawn);
     bool hasPlayerInLoS();
+    bool IsAgentVisibleInCamera(APawn* pawn);
+    //bool getInFrame();
     ASDTFleeLocation* GetBestFleeLocation();
     ASDTCollectible* GetRandomCollectible();
 
@@ -93,6 +95,7 @@ public:
     uint16  m_playerPosBBKeyID;
     uint16  m_fleePosBBKeyID;
 	uint16  m_followingPosBBKeyID;
+    uint16  m_updateTick;
 
     ASDTCollectible* currentCollectible = nullptr;
 

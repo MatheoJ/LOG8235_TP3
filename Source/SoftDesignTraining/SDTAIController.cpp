@@ -13,6 +13,7 @@
 #include "EngineUtils.h"
 #include "FollowingGroupManager.h"
 #include "SoftDesignTrainingCharacter.h"
+#include "MyPlayerCameraManager.h"
 
 ASDTAIController::ASDTAIController(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer.SetDefaultSubobjectClass<USDTPathFollowingComponent>(TEXT("PathFollowingComponent")))
@@ -33,6 +34,93 @@ void ASDTAIController::Tick(float deltaTime)
 		DrawDebugSphere(GetWorld(), GetPawn()->GetActorLocation() + FVector(0.f, 0.f, 100.f), 50.f, 8, FColor::Red);
 	}
 }
+
+bool ASDTAIController::IsAgentVisibleInCamera(APawn* pawn)
+{
+    if (!pawn)
+    {
+        return false;
+    }
+
+
+    APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+    if (!CameraManager)
+    {
+        return false;
+    }
+
+
+    FVector PawnLocation = pawn->GetActorLocation();
+
+    // Récupérer la position et la rotation de la caméra
+    FVector CameraLocation = CameraManager->GetCameraLocation();
+    FRotator CameraRotation = CameraManager->GetCameraRotation();
+
+    // Calculer le vecteur entre la caméra et le pawn
+    FVector DirectionToPawn = (PawnLocation - CameraLocation).GetSafeNormal();
+
+    // Calculer le vecteur "forward" de la caméra (direction dans laquelle elle regarde)
+    FVector CameraForward = CameraRotation.Vector();
+
+    // Calculer l'angle entre la direction vers le pawn et la direction de la caméra
+    float DotProduct = FVector::DotProduct(DirectionToPawn, CameraForward);
+    float AngleDegrees = FMath::Acos(DotProduct) * (180.f / PI); // Conversion en degrés
+
+    // Récupérer le FOV actuel de la caméra
+    float CameraFOV = CameraManager->GetFOVAngle();
+
+    // Vérifier si l'angle est dans le champ de vision
+    if (AngleDegrees <= CameraFOV / 2.f)
+    {
+        return true; // Le pawn est dans le champ de vision
+    }
+
+    return false; // Le pawn est hors du champ de vision
+}
+
+//bool ASDTAIController::getInFrame()
+//{
+//
+//    APawn* pawn = this->GetPawn();
+//
+//   /* if (GEngine) {
+//        if(GetWorld())
+//        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Valeur : %d"), pawn));
+//    }*/
+//
+//  
+//      if (pawn) {
+//    AMyPlayerCameraManager* Manager = AMyPlayerCameraManager::GetInstance();
+//    
+//    //UqueueManager* queueManager = Cast<UqueueManager>(UGameplayStatics::GetActorOfClass(GetWorld(), UqueueManager::StaticClass()));
+//
+////    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Valeur : %d"), Manager->TimeSpent));
+//    
+//    
+//    if (IsAgentVisibleInCamera(pawn))
+//    {
+//        Manager->addAgent(pawn);
+// 
+//    }
+//
+//
+//
+//    if (Manager->GetAllAgents().Contains(pawn))
+//        return true;
+//
+//    else
+//    {
+//        return false;
+//
+//
+//             }
+//            }
+//   
+//    //if(GEngine)
+//    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Valeur : %d"), pawn));
+//    return false;
+//
+//}
 
 void ASDTAIController::GoToBestTarget(float deltaTime)
 {
@@ -451,6 +539,7 @@ void ASDTAIController::OnPossess(APawn* pawn)
             m_collectiblePosBBKeyID = m_blackboardComponent->GetKeyID("CollectiblePos");
             m_fleePosBBKeyID = m_blackboardComponent->GetKeyID("FleePos");
 			m_followingPosBBKeyID = m_blackboardComponent->GetKeyID("FollowingPos");
+            m_updateTick = m_blackboardComponent->GetKeyID("UpdateTick");
 
             //Set this agent in the BT
             m_blackboardComponent->SetValue<UBlackboardKeyType_Object>(m_blackboardComponent->GetKeyID("SelfActor"), pawn);
