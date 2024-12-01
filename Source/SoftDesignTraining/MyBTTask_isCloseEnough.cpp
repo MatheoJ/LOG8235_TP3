@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MyBTTask_JoinFollowingGroup.h"
+#include "MyBTTask_isCloseEnough.h"
 
 #include "SoftDesignTraining.h"
 #include "SoftDesignTrainingCharacter.h"
@@ -11,17 +11,14 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 #include "FollowingGroupManager.h"
 
-EBTNodeResult::Type UMyBTTask_JoinFollowingGroup::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UMyBTTask_isCloseEnough::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
-		FollowingGroupManager::AddToGroup(aiController->GetPawn());
-		FollowingGroupManager::lastKnownPosition = 
-            OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(aiController->m_playerPosBBKeyID);
-
-		return EBTNodeResult::Succeeded;
+        constexpr float distanceThreshold = 30.0f;
+        if (FVector::Dist(aiController->GetPawn()->GetActorLocation(), FollowingGroupManager::lastKnownPosition) < distanceThreshold) {
+            return EBTNodeResult::Succeeded;
+        }
     }
-
     return EBTNodeResult::Failed;
 }
