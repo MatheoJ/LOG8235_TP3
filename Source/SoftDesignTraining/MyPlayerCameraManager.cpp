@@ -78,25 +78,25 @@ void AMyPlayerCameraManager::addAgent(APawn* Agent, float timedUsed)
    
 
     //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Valeur : %f"), TimeSpent));
-    if (queueManager->GetAllAgents().Contains(Agent) && TimeSpent < AgentUpdateBudget && !ManagedAgents.Contains(Agent))
+    if (queueManager->GetAllAgents().Contains(Agent) && !ManagedAgents.Contains(Agent))
     {
 
         increment(timedUsed);
         queueManager->removeAgent(Agent);
         ManagedAgents.Add(Agent);
-         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Purple, FString::Printf(TEXT("queue : %f"), TimeSpent));
+         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Purple, FString::Printf(TEXT("queue : %d"), queueManager->GetAllAgents().Num()));
     }
 
 
-    else if (queueManager->GetAllAgents().IsEmpty() && TimeSpent < AgentUpdateBudget && !ManagedAgents.Contains(Agent))
+    else if (queueManager->GetAllAgents().Num()==0 && TimeSpent < AgentUpdateBudget && !ManagedAgents.Contains(Agent))
     {
         
         increment(timedUsed);
         ManagedAgents.Add(Agent);
-         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("de base : %f"), TimeSpent));
+         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("de base : %d"), ManagedAgents.Num()));
     }
 
-    else
+    else if (!queueManager->GetAllAgents().Contains(Agent))
     {
           GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Valeur : %f"), TimeSpent));
         queueManager->addAgent(Agent);
