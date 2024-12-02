@@ -13,6 +13,7 @@
 
 EBTNodeResult::Type UMyBTTask_JoinFollowingGroup::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
         APawn* pawn = aiController->GetPawn();
