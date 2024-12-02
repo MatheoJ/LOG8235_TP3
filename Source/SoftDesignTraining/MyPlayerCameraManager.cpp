@@ -78,7 +78,7 @@ void AMyPlayerCameraManager::addAgent(APawn* Agent, float timedUsed)
    
 
     //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Valeur : %f"), TimeSpent));
-    if (queueManager->GetAllAgents().Contains(Agent) && !ManagedAgents.Contains(Agent))
+    if (queueManager->GetAllAgents().Contains(Agent) && TimeSpent < AgentUpdateBudget && !ManagedAgents.Contains(Agent))
     {
 
         increment(timedUsed);
