@@ -96,6 +96,7 @@ public:
     uint16  m_fleePosBBKeyID;
 	uint16  m_followingPosBBKeyID;
     uint16  m_updateTick;
+    uint16  m_angle;
 
     ASDTCollectible* currentCollectible = nullptr;
 

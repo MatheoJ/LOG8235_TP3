@@ -14,35 +14,6 @@ EBTNodeResult::Type UMyBTTask_hasNotArrived::ExecuteTask(UBehaviorTreeComponent&
 {
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
-
-        //APawn* selfPawn = aiController->GetPawn();
-
-        //double startTime = FPlatformTime::Seconds();
-
-        //auto measureAndLogTime = [&]()
-        //    {
-        //        double endTime = FPlatformTime::Seconds();
-        //        double timeTakenInSeconds = endTime - startTime;
-        //        double timeTakenInMilliseconds = timeTakenInSeconds * 1000.0;
-        //        AMyPlayerCameraManager* UpdateManager = AMyPlayerCameraManager::GetInstance();
-        //        if (UpdateManager)
-        //        {
-        //            UpdateManager->increment(timeTakenInSeconds);
-        //        }
-        //        FString debugMessage = FString::Printf(TEXT("Player detection time : %f ms"), timeTakenInMilliseconds);
-
-        //        if (APawn* selfPawn = aiController->GetPawn())
-        //        {
-        //            FVector debugLocation = selfPawn->GetActorLocation() + FVector(20, 0, 100);
-        //           // DrawDebugString(GetWorld(), debugLocation, debugMessage, nullptr, FColor::Yellow, DeltaSeconds, true);
-        //        }
-        //    };
-
-        //if (!selfPawn)
-        //{
-        //    measureAndLogTime();
-        //    return;
-        //}
         APawn* pawn = aiController->GetPawn();
         if (!pawn)
         {
@@ -58,9 +29,12 @@ EBTNodeResult::Type UMyBTTask_hasNotArrived::ExecuteTask(UBehaviorTreeComponent&
             return EBTNodeResult::Failed;
         }
 
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            return EBTNodeResult::Failed;
+        }
 
 		constexpr float distanceThreshold = 50.0f;
-        if (FVector::Dist(aiController->GetPawn()->GetActorLocation(), FollowingGroupManager::lastKnownPosition) > distanceThreshold&& BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+        if (FVector::Dist(aiController->GetPawn()->GetActorLocation(), FollowingGroupManager::lastKnownPosition) > distanceThreshold) {
             pawn->SetActorTickEnabled(true);
 			return EBTNodeResult::Succeeded;
         }

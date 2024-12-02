@@ -25,15 +25,17 @@ EBTNodeResult::Type UMyBTTask_isPlayerPoweredUp::ExecuteTask(UBehaviorTreeCompon
             return EBTNodeResult::Failed;
         }
 
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
 
-    if (SDTUtils::IsPlayerPoweredUp(GetWorld()) && BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
-        pawn->SetActorTickEnabled(true);
-        return EBTNodeResult::Succeeded;
+            pawn->SetActorTickEnabled(false);
+            return EBTNodeResult::Failed;
+        }
+
+        if (SDTUtils::IsPlayerPoweredUp(GetWorld())) {
+            pawn->SetActorTickEnabled(true);
+            return EBTNodeResult::Succeeded;
+        }
+        pawn->SetActorTickEnabled(false);
     }
-
-    pawn->SetActorTickEnabled(false);
-
-    }
-
     return EBTNodeResult::Failed;
 }

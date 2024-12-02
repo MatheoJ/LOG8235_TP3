@@ -342,7 +342,7 @@ bool ASDTAIController::hasPlayerInLoS()
     if (!selfPawn)
         return false;
 
-    FVector detectionStartLocation = selfPawn->GetActorLocation() + selfPawn->GetActorForwardVector() * m_DetectionCapsuleForwardStartingOffset;
+    FVector detectionStartLocation = selfPawn->GetActorLocation() + selfPawn->GetActorForwardVector() * (-100.0f);
     FVector detectionEndLocation = detectionStartLocation + selfPawn->GetActorForwardVector() * m_DetectionCapsuleHalfLength * 2;
 
     TArray<TEnumAsByte<EObjectTypeQuery>> detectionTraceObjectTypes;
@@ -540,6 +540,7 @@ void ASDTAIController::OnPossess(APawn* pawn)
             m_fleePosBBKeyID = m_blackboardComponent->GetKeyID("FleePos");
 			m_followingPosBBKeyID = m_blackboardComponent->GetKeyID("FollowingPos");
             m_updateTick = m_blackboardComponent->GetKeyID("UpdateTick");
+			m_angle = m_blackboardComponent->GetKeyID("Angle");
 
             //Set this agent in the BT
             m_blackboardComponent->SetValue<UBlackboardKeyType_Object>(m_blackboardComponent->GetKeyID("SelfActor"), pawn);

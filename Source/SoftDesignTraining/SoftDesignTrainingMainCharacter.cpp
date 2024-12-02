@@ -52,3 +52,11 @@ void ASoftDesignTrainingMainCharacter::OnPowerUpDone()
 
     GetWorld()->GetTimerManager().ClearTimer(m_PowerUpTimer);
 }
+
+void ASoftDesignTrainingMainCharacter::Tick(float deltaTime) {
+	//float smallRadius = 300.0f;
+	//float bigRadius = 400.0f;
+
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), smallRadius, 40, FColor::Green, false, 0.1f);   
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), bigRadius, 20, FColor::Red, false, 0.1f);
+}

@@ -16,41 +16,12 @@ EBTNodeResult::Type UMyBTTask_IsInGroup::ExecuteTask(UBehaviorTreeComponent& Own
 {
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
-        //APawn* selfPawn = aiController->GetPawn();
-
-        //double startTime = FPlatformTime::Seconds();
-        //auto measureAndLogTime = [&]()
-        //    {
-        //        double endTime = FPlatformTime::Seconds();
-        //        double timeTakenInSeconds = endTime - startTime;
-        //        double timeTakenInMilliseconds = timeTakenInSeconds * 1000.0;
-        //        AMyPlayerCameraManager* UpdateManager = AMyPlayerCameraManager::GetInstance();
-        //        if (UpdateManager)
-        //        {
-        //            UpdateManager->increment(timeTakenInSeconds);
-        //        }
-        //        FString debugMessage = FString::Printf(TEXT("Player detection time : %f ms"), timeTakenInMilliseconds);
-
-        //        if (APawn* selfPawn = aiController->GetPawn())
-        //        {
-        //            FVector debugLocation = selfPawn->GetActorLocation() + FVector(20, 0, 100);
-        //            // DrawDebugString(GetWorld(), debugLocation, debugMessage, nullptr, FColor::Yellow, DeltaSeconds, true);
-        //        }
-        //    };
-
-        //if (!selfPawn)
-        //{
-        //    measureAndLogTime();
-        //    return;
-        //}
-
         APawn* pawn = aiController->GetPawn();
         if (!pawn)
         {
             UE_LOG(LogTemp, Error, TEXT("Pawn is null in UMyBTTask_UpdateTick::ExecuteTask"));
             return EBTNodeResult::Failed; // Retournez "Failed" si le Pawn est nul
         }
-
 
         UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
         if (!BlackboardComp)
@@ -59,12 +30,16 @@ EBTNodeResult::Type UMyBTTask_IsInGroup::ExecuteTask(UBehaviorTreeComponent& Own
             return EBTNodeResult::Failed;
         }
 
-        if (FollowingGroupManager::isInGroup(pawn) && BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
-            pawn->SetActorTickEnabled(true);
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            pawn->SetActorTickEnabled(false);
+            return EBTNodeResult::Failed;
+        }
+     
+        pawn->SetActorTickEnabled(true);
+
+        if (FollowingGroupManager::isInGroup(pawn)) {
             return EBTNodeResult::Succeeded;
         }
-        pawn->SetActorTickEnabled(false);
-      
     }
 
     return EBTNodeResult::Failed;

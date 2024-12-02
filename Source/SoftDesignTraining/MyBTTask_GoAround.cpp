@@ -9,6 +9,7 @@
 #include "MyBTTask_isPlayerDetected.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Float.h"
 #include "FollowingGroupManager.h"
 
 EBTNodeResult::Type UMyBTTask_GoAround::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -22,24 +23,33 @@ EBTNodeResult::Type UMyBTTask_GoAround::ExecuteTask(UBehaviorTreeComponent& Owne
             return EBTNodeResult::Failed; // Retournez "Failed" si le Pawn est nul
         }
 
-
         UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
         if (!BlackboardComp)
         {
             UE_LOG(LogTemp, Error, TEXT("BlackboardComponent is null in UMyBTTask_UpdateTick::ExecuteTask"));
             return EBTNodeResult::Failed;
         }
-        if ( BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick))
+
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick))
         {
+			return EBTNodeResult::Failed;
+		}
+
         FVector objectif = FollowingGroupManager::lastKnownPosition;
-		FVector random = FVector(FMath::RandRange(-15, 15), FMath::RandRange(-100, 100), 0);
-		objectif += random;
-        //aiController->MoveToLocation(objectif, 0.5f, false, true, false, false, NULL, false);
+
+        FVector CurrentAIm = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(aiController->m_followingPosBBKeyID);
+
+        float currentDistance = FVector::Distance(CurrentAIm, objectif);
+
+		float angle = BlackboardComp->GetValue<UBlackboardKeyType_Float>(aiController->m_angle);
+        FVector random = FVector(LookAroundDistance * FMath::Cos(angle), LookAroundDistance * FMath::Sin(angle), 0);
+        objectif += random;
+
+        DrawDebugSphere(GetWorld(), objectif, 50.f, 8, FColor::Orange);
 
         OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Vector>(aiController->m_followingPosBBKeyID, objectif);
-        
+
         return EBTNodeResult::Succeeded;
-        }
     }
 
     return EBTNodeResult::Failed;

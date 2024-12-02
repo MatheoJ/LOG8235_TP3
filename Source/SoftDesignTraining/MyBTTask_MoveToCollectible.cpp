@@ -18,30 +18,6 @@ EBTNodeResult::Type UMyBTTask_MoveToCollectible::ExecuteTask(UBehaviorTreeCompon
         APawn* selfPawn = aiController->GetPawn();
 
         double startTime = FPlatformTime::Seconds();
-        //auto measureAndLogTime = [&]()
-        //    {
-        //        double endTime = FPlatformTime::Seconds();
-        //        double timeTakenInSeconds = endTime - startTime;
-        //        double timeTakenInMilliseconds = timeTakenInSeconds * 1000.0;
-        //        AMyPlayerCameraManager* UpdateManager = AMyPlayerCameraManager::GetInstance();
-        //        if (UpdateManager)
-        //        {
-        //            UpdateManager->increment(timeTakenInSeconds);
-        //        }
-        //        FString debugMessage = FString::Printf(TEXT("Player detection time : %f ms"), timeTakenInMilliseconds);
-
-        //        if (APawn* selfPawn = aiController->GetPawn())
-        //        {
-        //            FVector debugLocation = selfPawn->GetActorLocation() + FVector(20, 0, 100);
-        //            // DrawDebugString(GetWorld(), debugLocation, debugMessage, nullptr, FColor::Yellow, DeltaSeconds, true);
-        //        }
-        //    };
-
-        //if (!selfPawn)
-        //{
-        //    measureAndLogTime();
-        //    return;
-        //}
 
         APawn* pawn = aiController->GetPawn();
         if (!pawn)
@@ -50,7 +26,6 @@ EBTNodeResult::Type UMyBTTask_MoveToCollectible::ExecuteTask(UBehaviorTreeCompon
             return EBTNodeResult::Failed; // Retournez "Failed" si le Pawn est nul
         }
 
-
         UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
         if (!BlackboardComp)
         {
@@ -58,20 +33,20 @@ EBTNodeResult::Type UMyBTTask_MoveToCollectible::ExecuteTask(UBehaviorTreeCompon
             return EBTNodeResult::Failed;
         }
 
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            pawn->SetActorTickEnabled(false);
+            return EBTNodeResult::Failed;
+        }
 
-        if (aiController->currentCollectible == nullptr && BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+        if (aiController->currentCollectible == nullptr) {
        
             //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Valeur : %f"), 0.002f));
             aiController->currentCollectible = aiController->GetRandomCollectible();
             aiController->MoveToLocation(aiController->currentCollectible->GetActorLocation(), 0.5f, false, true, false, false, NULL, false);
             pawn->SetActorTickEnabled(true);
             return EBTNodeResult::Succeeded;
-           
         }
-
         pawn->SetActorTickEnabled(false);
-       
-
     }
     return EBTNodeResult::Failed;
    

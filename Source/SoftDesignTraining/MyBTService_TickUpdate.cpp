@@ -13,16 +13,9 @@ UMyBTService_TickUpdate::UMyBTService_TickUpdate()
      StartTime = FPlatformTime::Seconds();
 }
 
-
-
 void UMyBTService_TickUpdate::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-
     Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
-
-
-
-
 
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
@@ -40,10 +33,8 @@ void UMyBTService_TickUpdate::TickNode(UBehaviorTreeComponent& OwnerComp, uint8*
             UE_LOG(LogTemp, Error, TEXT("UpdateManager is null"));
             return;
         }
-
-
+        
         const double Budget = 0.002f;
-
 
         UWorld* World = GetWorld();
         if (!World)
@@ -52,52 +43,30 @@ void UMyBTService_TickUpdate::TickNode(UBehaviorTreeComponent& OwnerComp, uint8*
             return;
         }
 
-
-
-
-            // Vérifier si le budget est dépassé
-            double CurrentTime = FPlatformTime::Seconds();
-            if (CurrentTime - StartTime >= Budget)
-            {
-                StartTime = FPlatformTime::Seconds();
-
-                BlackboardComp->SetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick, false);
-
-            }
+        double CurrentTime = FPlatformTime::Seconds();
+        if (CurrentTime - StartTime >= Budget)
+        {
+            StartTime = FPlatformTime::Seconds();
+            BlackboardComp->SetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick, false);
+        }
             
-            if (DeltaSeconds>= 0.599f)
-            {
+        if (DeltaSeconds>= 0.599f)
+        {
+            UpdateManager->resetAll();
+        }
 
-                UpdateManager->resetAll();
-
-
-            }
-
-            //  GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("de base : %f"), CurrentTime - StartTime));
-
-
-            // Vérifier si l'agent est visible
-            if (aiController->IsAgentVisibleInCamera(pawn))
-            {
-                UpdateManager->addAgent(pawn, (CurrentTime - StartTime));
-
-            }
-      
-        
-
-
+        if (aiController->IsAgentVisibleInCamera(pawn))
+        {
+            UpdateManager->addAgent(pawn, (CurrentTime - StartTime));
+        }
 
         if (UpdateManager->GetAllAgents().Contains(pawn) || UpdateManager->GetAllAgents().Num() == 0) {
             BlackboardComp->SetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick, true);
-
         }
         else
         {
             BlackboardComp->SetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick, false);
         }
-
-        double EndTime = FPlatformTime::Seconds();
-
     }
 
 

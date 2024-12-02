@@ -29,11 +29,17 @@ EBTNodeResult::Type UMyBTTask_MoveTowards::ExecuteTask(UBehaviorTreeComponent& O
             UE_LOG(LogTemp, Error, TEXT("BlackboardComponent is null in UMyBTTask_UpdateTick::ExecuteTask"));
             return EBTNodeResult::Failed;
         }
-        if (BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            pawn->SetActorTickEnabled(false);
+            return EBTNodeResult::Failed;
+        }
+
+        pawn->SetActorTickEnabled(true);
         FVector position = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(aiController->m_followingPosBBKeyID);
         aiController->MoveToLocation(position, 0.5f, false, true, false, false, NULL, false);
+		DrawDebugSphere(GetWorld(), position, 50, 20, FColor::Green, false, 2.0f);
         return EBTNodeResult::Succeeded;
-        }
     }
 
     return EBTNodeResult::Failed;

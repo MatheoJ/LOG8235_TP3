@@ -30,8 +30,12 @@ EBTNodeResult::Type UMyBTTask_isCloseEnough::ExecuteTask(UBehaviorTreeComponent&
             return EBTNodeResult::Failed;
         }
 
-        constexpr float distanceThreshold = 30.0f;
-        if (FVector::Dist(aiController->GetPawn()->GetActorLocation(), FollowingGroupManager::lastKnownPosition) < distanceThreshold && BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            return EBTNodeResult::Failed;
+        }
+
+		constexpr float distanceThreshold = 400.0f;
+        if (FVector::Dist(aiController->GetPawn()->GetActorLocation(), FollowingGroupManager::lastKnownPosition) < distanceThreshold) {
             return EBTNodeResult::Succeeded;
         }
     }

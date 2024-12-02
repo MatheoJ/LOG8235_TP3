@@ -9,6 +9,7 @@
 #include "MyBTTask_isPlayerDetected.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Float.h"
 #include "FollowingGroupManager.h"
 
 EBTNodeResult::Type UMyBTTask_JoinFollowingGroup::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -23,7 +24,6 @@ EBTNodeResult::Type UMyBTTask_JoinFollowingGroup::ExecuteTask(UBehaviorTreeCompo
             return EBTNodeResult::Failed; // Retournez "Failed" si le Pawn est nul
         }
 
-
         UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
         if (!BlackboardComp)
         {
@@ -31,15 +31,16 @@ EBTNodeResult::Type UMyBTTask_JoinFollowingGroup::ExecuteTask(UBehaviorTreeCompo
             return EBTNodeResult::Failed;
         }
 
-        if ( BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
-            pawn->SetActorTickEnabled(true);
-		FollowingGroupManager::AddToGroup(pawn);
-		FollowingGroupManager::lastKnownPosition = 
-            OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(aiController->m_playerPosBBKeyID);
-
-		return EBTNodeResult::Succeeded;
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            pawn->SetActorTickEnabled(false);
+            return EBTNodeResult::Failed;
         }
-        pawn->SetActorTickEnabled(false);
+
+        pawn->SetActorTickEnabled(true);
+		BlackboardComp->SetValue<UBlackboardKeyType_Float>(aiController->m_angle, FMath::RandRange(0, 360));
+		FollowingGroupManager::AddToGroup(pawn);
+		FollowingGroupManager::lastKnownPosition = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(aiController->m_playerPosBBKeyID);
+		return EBTNodeResult::Succeeded;
     }
 
     return EBTNodeResult::Failed;

@@ -28,12 +28,15 @@ EBTNodeResult::Type UMyBTTask_UpdateCollectiblePos::ExecuteTask(UBehaviorTreeCom
             UE_LOG(LogTemp, Error, TEXT("BlackboardComponent is null in UMyBTTask_UpdateTick::ExecuteTask"));
             return EBTNodeResult::Failed;
         }
-        if (BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
-            pawn->SetActorTickEnabled(true);
+
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            pawn->SetActorTickEnabled(false);
+            return EBTNodeResult::Failed;
+        }
+
+        pawn->SetActorTickEnabled(true);
         OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Vector>(aiController->m_collectiblePosBBKeyID, aiController->GetRandomCollectible()->GetActorLocation());
         return EBTNodeResult::Succeeded;
-    }
-        pawn->SetActorTickEnabled(false);
     }
     return EBTNodeResult::Failed;
 }

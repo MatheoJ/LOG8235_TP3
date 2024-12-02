@@ -30,12 +30,13 @@ EBTNodeResult::Type UMyBTTask_UpdateFollowingPosition::ExecuteTask(UBehaviorTree
             return EBTNodeResult::Failed;
         }
 
-        if (BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
-            pawn->SetActorTickEnabled(true);
-        OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Vector>(aiController->m_playerPosBBKeyID, FollowingGroupManager::lastKnownPosition);
-		return EBTNodeResult::Succeeded;
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            pawn->SetActorTickEnabled(false);
         }
-        pawn->SetActorTickEnabled(false);
+
+        pawn->SetActorTickEnabled(true);
+        OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Vector>(aiController->m_followingPosBBKeyID, FollowingGroupManager::lastKnownPosition);
+		return EBTNodeResult::Succeeded;
     }
     return EBTNodeResult::Failed;
 }

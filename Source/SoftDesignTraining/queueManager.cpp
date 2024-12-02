@@ -6,22 +6,15 @@
 
 UqueueManager* UqueueManager::Instance = nullptr;
 
-UqueueManager::UqueueManager()
-{
-    //PrimaryActorTick.bCanEverTick = true;
-}
-
+UqueueManager::UqueueManager() {}
 
 void UqueueManager::addAgent(APawn* Agent)
 {
-   
-
     if (Agent && !ManagedAgents.Contains(Agent))
     {
         ManagedAgents.Add(Agent);
     }
 }
-
 
 void UqueueManager::removeAgent(APawn* Agent)
 {
@@ -30,7 +23,6 @@ void UqueueManager::removeAgent(APawn* Agent)
         ManagedAgents.Remove(Agent);
     }
 }
-
 
 TArray<APawn*> UqueueManager::GetAllAgents()
 {

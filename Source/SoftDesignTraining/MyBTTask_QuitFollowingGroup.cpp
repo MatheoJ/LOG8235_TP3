@@ -29,13 +29,14 @@ EBTNodeResult::Type UMyBTTask_QuitFollowingGroup::ExecuteTask(UBehaviorTreeCompo
             return EBTNodeResult::Failed;
         }
 
-        if (BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
-            pawn->SetActorTickEnabled(true);
+        if (!BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
+            pawn->SetActorTickEnabled(false);
+            return EBTNodeResult::Failed;
+        }
+
+        pawn->SetActorTickEnabled(true);
 		FollowingGroupManager::RemoveFromGroup(aiController->GetPawn());
 		return EBTNodeResult::Succeeded;
-        }
-        pawn->SetActorTickEnabled(false);
-
     }
 
     return EBTNodeResult::Failed;

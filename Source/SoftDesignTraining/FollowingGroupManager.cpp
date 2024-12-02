@@ -29,7 +29,7 @@ void FollowingGroupManager::RemoveFromGroup(APawn* character)
 	}
 	m_followingGroup.Remove(character);
 
-	if (m_followingGroup.Num()) {
+	if (m_followingGroup.Num() == 0) {
 		lastKnownPosition = FVector::Zero();
 	}
 }
