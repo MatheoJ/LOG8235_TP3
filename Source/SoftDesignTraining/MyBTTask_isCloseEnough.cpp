@@ -15,8 +15,23 @@ EBTNodeResult::Type UMyBTTask_isCloseEnough::ExecuteTask(UBehaviorTreeComponent&
 {
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
+        APawn* pawn = aiController->GetPawn();
+        if (!pawn)
+        {
+            UE_LOG(LogTemp, Error, TEXT("Pawn is null in UMyBTTask_UpdateTick::ExecuteTask"));
+            return EBTNodeResult::Failed; // Retournez "Failed" si le Pawn est nul
+        }
+
+
+        UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
+        if (!BlackboardComp)
+        {
+            UE_LOG(LogTemp, Error, TEXT("BlackboardComponent is null in UMyBTTask_UpdateTick::ExecuteTask"));
+            return EBTNodeResult::Failed;
+        }
+
         constexpr float distanceThreshold = 30.0f;
-        if (FVector::Dist(aiController->GetPawn()->GetActorLocation(), FollowingGroupManager::lastKnownPosition) < distanceThreshold) {
+        if (FVector::Dist(aiController->GetPawn()->GetActorLocation(), FollowingGroupManager::lastKnownPosition) < distanceThreshold && BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
             return EBTNodeResult::Succeeded;
         }
     }

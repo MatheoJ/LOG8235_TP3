@@ -15,9 +15,25 @@ EBTNodeResult::Type UMyBTTask_MoveTowards::ExecuteTask(UBehaviorTreeComponent& O
 {
     if (ASDTAIController* aiController = Cast<ASDTAIController>(OwnerComp.GetAIOwner()))
     {
+        APawn* pawn = aiController->GetPawn();
+        if (!pawn)
+        {
+            UE_LOG(LogTemp, Error, TEXT("Pawn is null in UMyBTTask_UpdateTick::ExecuteTask"));
+            return EBTNodeResult::Failed; // Retournez "Failed" si le Pawn est nul
+        }
+
+
+        UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
+        if (!BlackboardComp)
+        {
+            UE_LOG(LogTemp, Error, TEXT("BlackboardComponent is null in UMyBTTask_UpdateTick::ExecuteTask"));
+            return EBTNodeResult::Failed;
+        }
+        if (BlackboardComp->GetValue<UBlackboardKeyType_Bool>(aiController->m_updateTick)) {
         FVector position = OwnerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Vector>(aiController->m_followingPosBBKeyID);
         aiController->MoveToLocation(position, 0.5f, false, true, false, false, NULL, false);
         return EBTNodeResult::Succeeded;
+        }
     }
 
     return EBTNodeResult::Failed;
